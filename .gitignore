@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# Environment
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.conda/
+*.env
+
+# PyTorch
+*.pth
+*.pt
+!encoder_sae_tiny_100k_1152_space.pth
+!decoder_sae_tiny_100k_1152_space.pth
+!librispeech_features_cache_tiny.pt
+
+# Logs
+*.log
+!sae_training.log
+!librispeech_sae_training_output.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Data
+data/
+datasets/
+cache/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Model outputs (keep only the final versions)
+encoder_sae_tiny.pth
+decoder_sae_tiny.pth
+encoder_sae_tiny_100k.pth
+decoder_sae_tiny_100k.pth
