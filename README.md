@@ -19,12 +19,31 @@ uv run pytest tests/ -v
 uv run jupyter notebook notebooks/logit_lens_and_attention.ipynb
 ```
 
+## Analysis Findings
+
+The attention analysis notebook (`notebooks/logit_lens_and_attention.ipynb`) reveals head specialization patterns in Whisper-tiny:
+
+### Encoder Self-Attention
+- **Highly local**: Most heads attend to nearby positions (diagonal patterns)
+- **Padding confound**: ~85% of each 30s window is padding for typical LibriSpeech clips
+- **Energy correlation**: Some heads preferentially attend to speech vs silence regions
+
+### Decoder Cross-Attention (Audio-Text Alignment)
+- **Alignment heads**: L0H4, L2H0, L2H5 show monotonic left-to-right progression
+- **Speech-focused**: Most heads correctly focus on speech region, ignoring padding
+- **Variable sharpness**: Some heads have peaked attention (precise alignment), others diffuse
+
+### Decoder Self-Attention (Linguistic Patterns)
+- **BOS anchors**: L0H4, L1H5 strongly attend to start-of-sequence token
+- **Previous token heads**: L0H1 preferentially attends to immediately preceding token
+- **Recency bias**: Most heads favor recent context over distant history
+
 ## Architecture
 
 - **TopK SAE**: Sparse autoencoder with TopK activation (more stable than L1 for speech)
 - **8x expansion**: 384 -> 3072 features for whisper-tiny
 - **Unit-norm decoder**: Normalized columns for training stability
-- **Dead feature resampling**: Reinitialize unused features
+- **Dead feature resampling**: Reinitialize unused features using high-residual examples
 
 ## Project Structure
 
