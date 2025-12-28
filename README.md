@@ -6,6 +6,38 @@ Mechanistic interpretability for OpenAI's Whisper speech model using Sparse Auto
 
 Train SAEs on Whisper's internal activations to discover interpretable features in speech processing. Analyze both encoder (acoustic/phonetic) and decoder (linguistic/semantic) representations.
 
+## Analysis Results
+
+### Encoder Self-Attention Patterns
+
+Each encoder layer shows predominantly **local attention** - audio frames attend to nearby frames. This makes sense for speech where neighboring frames are acoustically correlated.
+
+![Encoder Attention](docs/images/encoder_attention.png)
+
+### Layer Representation Similarity
+
+Cosine similarity between encoder layer representations shows gradual transformation across layers.
+
+![Layer Similarity](docs/images/layer_similarity.png)
+
+### Cross-Attention: Audio to Text Alignment
+
+Shows which audio frames the decoder attends to when generating each token. You can see the monotonic alignment typical of speech recognition.
+
+![Cross Attention](docs/images/cross_attention.png)
+
+### Encoder Lens: When Does Transcription Emerge?
+
+Projecting each encoder layer through the decoder reveals when semantic content becomes available.
+
+![Encoder Lens](docs/images/encoder_lens.png)
+
+### Activation Patching: Causal Importance
+
+Zeroing out each encoder layer and measuring WER change shows all layers are causally important.
+
+![Activation Patching](docs/images/activation_patching.png)
+
 ## Quick Start
 
 ```bash
