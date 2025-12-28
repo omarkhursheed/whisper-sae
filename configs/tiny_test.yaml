@@ -1,0 +1,44 @@
+# Minimal configuration for local testing
+# Uses small dataset and few epochs for quick iteration
+
+whisper:
+  model_name: "openai/whisper-tiny"
+
+sae:
+  expansion_factor: 8
+  activation: "topk"
+  k: 32
+  normalize_decoder: true
+  dead_feature_threshold: 1000
+  dead_feature_resample: true
+
+training:
+  batch_size: 64
+  learning_rate: 0.0001
+  weight_decay: 0.0
+  epochs: 3
+  warmup_steps: 100
+  gradient_clip: 1.0
+  use_amp: true
+  checkpoint_every: 2
+  seed: 42
+  num_workers: 2
+
+data:
+  dataset_name: "librispeech_asr"
+  dataset_subset: "clean"
+  dataset_split: "validation"  # Smaller than train
+  max_samples: 500  # Very small for testing
+  cache_dir: "cache"
+  streaming: true
+
+wandb:
+  enabled: false  # Disabled for testing
+  project: "whisper-sae"
+  tags:
+    - "test"
+
+encoder_layers: [0]  # Only layer 0 for testing
+decoder_layers: []   # Skip decoder for speed
+output_dir: "outputs"
+experiment_name: "test_run"

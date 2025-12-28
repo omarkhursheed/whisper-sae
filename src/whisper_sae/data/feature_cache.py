@@ -35,7 +35,20 @@ class CacheMetadata:
 
     def to_json(self) -> str:
         """Serialize to JSON string."""
-        return json.dumps(self.__dict__, indent=2)
+        # Convert Path objects to strings for JSON serialization
+        data = {}
+        for key, value in self.__dict__.items():
+            if isinstance(value, dict):
+                # Handle nested dicts (like data_config)
+                data[key] = {
+                    k: str(v) if isinstance(v, Path) else v
+                    for k, v in value.items()
+                }
+            elif isinstance(value, Path):
+                data[key] = str(value)
+            else:
+                data[key] = value
+        return json.dumps(data, indent=2)
 
     @classmethod
     def from_json(cls, json_str: str) -> "CacheMetadata":

@@ -69,9 +69,10 @@ class SAETrainer:
         # Scheduler will be set up when we know the total steps
         self.scheduler = None
 
-        # Mixed precision
-        self.scaler = torch.amp.GradScaler("cuda", enabled=config.use_amp and device != "cpu")
-        self.use_amp = config.use_amp and str(device) != "cpu"
+        # Mixed precision (only supported on CUDA, not MPS)
+        is_cuda = str(device).startswith("cuda")
+        self.scaler = torch.amp.GradScaler("cuda", enabled=config.use_amp and is_cuda)
+        self.use_amp = config.use_amp and is_cuda
 
         # Tracking
         self.global_step = 0
@@ -157,16 +158,21 @@ class SAETrainer:
             milestones=[warmup_steps],
         )
 
-    def train_step(self, batch: Tensor) -> TrainingMetrics:
+    def train_step(self, batch: Tensor | tuple | list) -> TrainingMetrics:
         """Run a single training step.
 
         Args:
-            batch: Batch of activations [batch, input_dim].
+            batch: Batch of activations [batch, input_dim] or tuple from TensorDataset.
 
         Returns:
             Training metrics for this step.
         """
         self.model.train()
+
+        # Handle TensorDataset which returns tuples/lists
+        if isinstance(batch, (tuple, list)):
+            batch = batch[0]
+
         batch = batch.to(self.device)
 
         # Forward pass with AMP

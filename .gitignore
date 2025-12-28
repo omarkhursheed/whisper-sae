@@ -80,3 +80,4 @@ audio_clips/
 archive/v1/*.pth
 archive/v1/*.pt
 archive/v1/*.log
+outputs/

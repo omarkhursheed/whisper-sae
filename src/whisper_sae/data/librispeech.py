@@ -4,14 +4,14 @@ This module provides utilities for loading and processing LibriSpeech data
 for Whisper SAE training. Based on the v1 caching pattern with improvements.
 """
 
-import os
+import io
 from itertools import islice
 from pathlib import Path
-from typing import Iterator
 
+import soundfile as sf
 import torch
 import torchaudio
-from datasets import load_dataset, IterableDataset
+from datasets import Audio, load_dataset
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 from torch import Tensor
 from torch.utils.data import Dataset, DataLoader
@@ -68,14 +68,14 @@ class LibriSpeechDataset(Dataset):
         """Process raw audio and cache to disk."""
         print(f"Processing LibriSpeech {self.config.dataset_subset} split...")
 
-        # Load streaming dataset
+        # Load streaming dataset with audio decoding disabled
+        # We decode manually with soundfile to avoid torchcodec issues on macOS
         dataset = load_dataset(
             self.config.dataset_name,
             self.config.dataset_subset,
             split=self.config.dataset_split,
             streaming=self.config.streaming,
-            trust_remote_code=True,
-        )
+        ).cast_column("audio", Audio(decode=False))
 
         with Progress(
             SpinnerColumn(),
@@ -106,14 +106,15 @@ class LibriSpeechDataset(Dataset):
         """Process a single audio sample.
 
         Args:
-            sample: Raw sample from HuggingFace dataset.
+            sample: Raw sample from HuggingFace dataset (with decode=False).
 
         Returns:
             Tuple of (input_features, metadata) or None if processing fails.
         """
         try:
-            speech_array = sample["audio"]["array"]
-            sampling_rate = sample["audio"]["sampling_rate"]
+            # Decode audio bytes using soundfile (avoids torchcodec issues on macOS)
+            audio_bytes = sample["audio"]["bytes"]
+            speech_array, sampling_rate = sf.read(io.BytesIO(audio_bytes))
 
             # Resample to 16kHz if needed
             if sampling_rate != 16000:
@@ -123,8 +124,6 @@ class LibriSpeechDataset(Dataset):
                 )
                 speech_tensor = torch.from_numpy(speech_array).float()
                 speech_array = resampler(speech_tensor).numpy()
-            else:
-                speech_array = speech_array
 
             # Handle multi-channel audio by averaging
             if speech_array.ndim > 1:

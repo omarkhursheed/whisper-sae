@@ -19,6 +19,27 @@ uv run pytest tests/ -v
 uv run jupyter notebook notebooks/logit_lens_and_attention.ipynb
 ```
 
+## Training
+
+```bash
+# Train SAEs on all encoder/decoder layers (uses default config)
+uv run python scripts/train.py --config configs/tiny_default.yaml
+
+# Train single layer for testing
+uv run python scripts/train.py --layer encoder:0 --no-wandb
+
+# Extract features only (useful for precomputing before training)
+uv run python scripts/train.py --extract-only
+
+# Quick local test with small dataset
+uv run python scripts/train.py --config configs/tiny_test.yaml --no-wandb
+```
+
+Training outputs go to `outputs/<experiment_name>/`. Each layer gets:
+- `sae_final.pt` - trained model weights
+- `metrics.json` - training metrics
+- `checkpoint_epoch*.pt` - intermediate checkpoints
+
 ## Analysis Findings
 
 The attention analysis notebook (`notebooks/logit_lens_and_attention.ipynb`) reveals head specialization patterns in Whisper-tiny:
