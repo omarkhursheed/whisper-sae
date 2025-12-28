@@ -1,0 +1,45 @@
+# Default configuration for Whisper-tiny SAE training
+
+whisper:
+  model_name: "openai/whisper-tiny"
+
+sae:
+  expansion_factor: 8
+  activation: "topk"
+  k: 32
+  normalize_decoder: true
+  dead_feature_threshold: 10000
+  dead_feature_resample: true
+
+training:
+  batch_size: 128
+  learning_rate: 0.0001
+  weight_decay: 0.0
+  epochs: 50
+  warmup_steps: 1000
+  gradient_clip: 1.0
+  use_amp: true
+  checkpoint_every: 10
+  seed: 42
+  num_workers: 4
+
+data:
+  dataset_name: "librispeech_asr"
+  dataset_subset: "clean"
+  dataset_split: "train.100"
+  max_samples: 100000
+  cache_dir: "cache"
+  streaming: true
+
+wandb:
+  enabled: true
+  project: "whisper-sae"
+  tags:
+    - "whisper-tiny"
+    - "librispeech"
+    - "topk"
+
+encoder_layers: [0, 1, 2, 3]
+decoder_layers: [0, 1, 2, 3]
+output_dir: "outputs"
+experiment_name: "tiny_8x_topk"
