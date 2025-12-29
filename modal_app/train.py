@@ -44,7 +44,8 @@ OUTPUT_DIR = "/outputs"
     gpu="A10G",
     timeout=3600 * 6,  # 6 hours max
     volumes={CACHE_DIR: cache_volume, OUTPUT_DIR: output_volume},
-    secrets=[modal.Secret.from_name("wandb-secret", required=False)],
+    # W&B secret is optional - set up in Modal dashboard if needed
+    secrets=[],
 )
 def train_sae(
     component: str = "encoder",
@@ -428,7 +429,8 @@ def train_sae(
     gpu="A10G",
     timeout=3600 * 24,  # 24 hours for all layers
     volumes={CACHE_DIR: cache_volume, OUTPUT_DIR: output_volume},
-    secrets=[modal.Secret.from_name("wandb-secret", required=False)],
+    # W&B secret is optional - set up in Modal dashboard if needed
+    secrets=[],
 )
 def train_all_layers(
     model_name: str = "openai/whisper-tiny",
